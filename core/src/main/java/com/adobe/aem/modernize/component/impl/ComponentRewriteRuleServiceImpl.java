@@ -87,7 +87,7 @@ public class ComponentRewriteRuleServiceImpl extends AbstractRewriteRuleService<
       if (deep) {
         List<RewriteRule> rewrites = create(rr, rules);
         Node node = resource.adaptTo(Node.class);
-        ComponentTreeRewriter.rewrite(node, rewrites);
+        ComponentTreeRewriter.process(node, rewrites);
       } else {
         apply(resource, rules);
       }
