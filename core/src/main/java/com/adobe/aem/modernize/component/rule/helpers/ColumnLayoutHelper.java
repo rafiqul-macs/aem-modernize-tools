@@ -229,6 +229,7 @@ public class ColumnLayoutHelper {
      * @param isNewline Whether this column should start a new line
      * @param isOffset Whether this column should have an offset
      */
+    //Following move method refactoring technique, Moved the addResponsive method from ColumnControlRewriteRule to the new helper class
     public void addResponsiveConfiguration(
             Node node,
             int columnIndex,
