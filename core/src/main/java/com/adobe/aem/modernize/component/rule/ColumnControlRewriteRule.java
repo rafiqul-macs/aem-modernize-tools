@@ -131,31 +131,41 @@ public class ColumnControlRewriteRule implements ComponentRewriteRule {
     return this.id;
   }
 
-  @Override
-  public boolean matches(@NotNull Node node) throws RepositoryException {
-
+  /**
+   * Checks if a node has a resource type that matches our criteria.
+   */
+  private boolean hasMatchingResourceType(Node node) throws RepositoryException {
     if (!node.hasProperty(SLING_RESOURCE_TYPE_PROPERTY)) {
       return false;
     }
-    Property property = node.getProperty(SLING_RESOURCE_TYPE_PROPERTY);
+    
     boolean found = false;
     Session session = node.getSession();
-    try (ResourceResolver rr = resourceResolverFactory.getResourceResolver(Collections.singletonMap(AUTHENTICATION_INFO_SESSION, session))) {
-      String resourceType = property.getString();
+
+    try (ResourceResolver rr = resourceResolverFactory.getResourceResolver(
+            Collections.singletonMap(AUTHENTICATION_INFO_SESSION, session))) {
+
+      String resourceType = node.getProperty(SLING_RESOURCE_TYPE_PROPERTY).getString();
+
       while (StringUtils.isNotBlank(resourceType)) {
         if (StringUtils.equals(RESPONSIVE_GRID_BASE_TYPE, resourceType)) {
           found = true;
-          break; // This node is of the correct type.
+          break;
         }
         resourceType = rr.getParentResourceType(resourceType);
-
       }
+
     } catch (LoginException e) {
       logger.error("Unable to get a ResourceResolver using Node Session info.", e);
       return false;
     }
 
-    if (!found) {
+    return found;
+  }
+
+  @Override
+  public boolean matches(@NotNull Node node) throws RepositoryException {
+    if (!hasMatchingResourceType(node)) {
       return false;
     }
 
